@@ -1,11 +1,7 @@
-var mongoose = require('mongoose'),
-
-Article = mongoose.model('articles', new mongoose.Schema({
-    content:String
-}));
+var mongoose = require('mongoose');
 
 module.exports = {
-    article:function(){
-        return new Article();
-    }
+    article:mongoose.model('articles', new mongoose.Schema({
+        content:String
+    }))
 };
