@@ -1,0 +1,12 @@
+*.jpg
+*.png
+*.gif
+*.sh
+*.mo
+*.db
+*.bk
+*.log
+node-*
+node_modules/*
+.emacs.desktop
+.emacs.desktop.lock
