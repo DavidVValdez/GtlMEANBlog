@@ -1,0 +1,3 @@
+curl 'http://localhost:8080/api/articles'
+
+curl -id '{"title":"Facus El Gato","content":"post acerca de Facus","publishDate":"2016-02-27T00:49:14.758Z"}' 'http://localhost:8080/api/articles'

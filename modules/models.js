@@ -2,6 +2,10 @@ var mongoose = require('mongoose');
 
 module.exports = {
     article:mongoose.model('articles', new mongoose.Schema({
-        content:String
+        date:{type:Date,default:Date.now},
+        title:String,
+        content:String,
+        publishDate:Date,
+        uriComponent:String
     }))
 };

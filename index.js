@@ -24,9 +24,16 @@ app.route('/api/articles')
     })
     .post(function(req,res){
         var article = new models.article();
+        article.title = req.body.title;
         article.content = req.body.content;
-        article.save();
-        res.send('');
+        article.publishDate = req.body.publishDate;
+        article.uriComponent = req.body.publishDate.substr(0,10)+'/'+req.body.title.replace(/[^a-zA-Z0-9]+/g,'-');
+        article.save(function(err){
+            if(err){
+                console.log('There was an error');
+            }
+            res.send('');
+        });
     });
 
 app.listen(8080);
