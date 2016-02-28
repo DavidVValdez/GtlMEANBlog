@@ -6,14 +6,7 @@ BasicStrategy = require('passport-http').BasicStrategy,
 users = require('../users.js'),
 conf = require('../conf.js'),
 
-router = express.Router(),
-verify = function(req,res,next){
-    if(false){
-        next();
-    }else{
-        res.send('unauthorized');
-    }
-};
+router = express.Router();
 
 /* ...................................................................... */
 
@@ -33,6 +26,5 @@ router.all('/',function(req,res){
 });
 
 module.exports = {
-    router:router,
-    verify:verify
+    router:router
 };
