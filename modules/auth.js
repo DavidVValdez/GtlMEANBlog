@@ -18,25 +18,18 @@ verify = function(req,res,next){
 /* ...................................................................... */
 
 passport.use(new BasicStrategy(function(user, pass, done){
-    return done(null,{u:user,p:pass});
+    var obj;
+    if(undefined !== (obj = users[user]) && obj.p === pass){
+        return done(null,{name:obj.name});
+    }else{
+        return done(null,false);
+    }
 }));
 
 router.use(passport.authenticate('basic',{session:false}));
 
-router.post('/',function(req,res){
-    res.json(req.user);
-    /*
-    var user;
-    if(undefined !== (user = users[req.body.u]) && user.p === req.body.p){
-        res.json({name:user.name,token:jwt.sign({name:user.name},conf.secret)});
-    }else{
-        res.send('wrong credentials');
-    }
-    */
-});
-
-router.get('/',function(req,res){
-    res.json(req.user);
+router.all('/',function(req,res){
+    res.json({user:req.user,token:jwt.sign(req.user,conf.secret)});
 });
 
 module.exports = {
