@@ -41,7 +41,7 @@ routerArticles.post('/articles', function(req,res){
     });
 });
 
-app.use('/api',auth.router);
+app.use('/',auth.router);
 app.use('/api',routerArticles);
 
 app.listen(8080);

@@ -13,7 +13,7 @@ verify = function(req,res,next){
     }
 };
 
-router.post('/session',function(req,res){
+router.post('/auth',function(req,res){
     var user;
     if(undefined !== (user = users[req.body.u]) && user.p === req.body.p){
         res.json({name:user.name,token:jwt.sign({name:user.name},conf.secret)});
@@ -22,7 +22,7 @@ router.post('/session',function(req,res){
     }
 });
 
-router.get('/session',function(req,res){
+router.get('/auth',function(req,res){
     res.send('foobar');
 });
 
