@@ -1,6 +1,6 @@
 (function(){
     'use strict';
-    var user,
+    var user = true,
     meanBlog = angular.module('meanBlog',['ngRoute','meanBlogCtrls'])
         .config(['$routeProvider',function($routeProvider){
             $routeProvider.when('/',{
@@ -11,15 +11,15 @@
             });
         }]),
     ctrls = angular.module('meanBlogCtrls',['ngResource'])
-        .factory('userSrvc',['$resource',function($resource){
-            return $resource('./gato-:gatoName.json',{},{
-                query:{method:'GET',params:{gatoName:'gato'},isArray:true}
-            });
+        .factory('userSrvc',[function(){
+            return function(){
+                return user;
+            };
         }])
-        .controller('indexCtrl',['userSrvc',function(){
+        .controller('indexCtrl',['userSrvc',function(userSrvc){
             var ctrl = this;
             ctrl.checkUser = function(){
-                return true;
+                return userSrvc();
             };
         }]);
 }());
