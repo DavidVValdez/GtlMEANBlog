@@ -86,6 +86,16 @@
 },{}],2:[function(require,module,exports){
 (function () {
     var handler = function () {
+        /*
+        console.log(this.readyState);
+        console.log(this.getAllResponseHeaders());
+        */
+        if (this.getAllResponseHeaders().indexOf('WWW-Authenticate') > -1) {
+            this.abort();
+        }
+        if (this.status === 401) {
+            this.abort();
+        }
         if (this.readyState === 4) {
             if (this.gtl.cbk !== undefined) {
                 this.gtl.cbk(this.status, this.responseText.length > 0 ? JSON.parse(this.responseText) : undefined);
@@ -95,13 +105,18 @@
     window.gtlXhr = function () {
         return new XMLHttpRequest();
     };
-    XMLHttpRequest.prototype.gtlFetch = function (mth, url, dta, cbk) {
+    XMLHttpRequest.prototype.gtlFetch = function (mth, url, dta, cbk, hds) {
         if (this.gtl === undefined) {
             this.gtl = {};
         }
         this.gtl.cbk = cbk;
         this.addEventListener('readystatechange', handler);
         this.open(mth, url);
+        if (hds !== undefined) {
+            for (var i = 0; i < hds.length; i++) {
+                this.setRequestHeader(hds[i][0], hds[i][1]);
+            }
+        }
         this.send(dta !== undefined ? typeof dta === 'object' ? JSON.stringify(dta) : dta : '');
     };
 })();
@@ -19142,50 +19157,61 @@ module.exports = require('./lib/React');
 (function () {
     'use strict';
 
-    var bearer,
-        Gtl = require('/web/gtl/v04.20.00/gtl/js/core.js'),
+    var Gtl = require('/web/gtl/v04.20.00/gtl/js/core.js'),
         Xhr = require('/web/gtl/v04.20.00/gtl/js/xhr.js'),
         React = require('react'),
         ReactDOM = require('react-dom'),
-        LoginForm = React.createClass(function () {
-        var sendCredentials = function (evt) {
+        bearer,
+        LoginForm = React.createClass({
+        displayName: 'LoginForm',
+
+        xhr: gtlXhr(),
+        onXhrReady: function () {
+            console.log(arguments);
+        },
+        getInitialState: function () {
+            return { u: '', p: '' };
+        },
+        uChange: function (evt) {
+            this.setState({ u: evt.target.value });
+        },
+        pChange: function (evt) {
+            this.setState({ p: evt.target.value });
+        },
+        onSubmit: function (evt) {
             evt.preventDefault();
-            console.log(this);
-        };
-        return {
-            render: function () {
-                return React.createElement(
-                    'form',
-                    { onSubmit: sendCredentials },
-                    React.createElement('input', { type: 'text', name: 'u' }),
-                    React.createElement('input', { type: 'password', name: 'p' }),
-                    React.createElement('input', { type: 'submit', value: 'login' })
-                );
-            }
-        };
-    }()),
-        Client = React.createClass(function () {
-        var checkAuth = function () {
-            return bearer === undefined ? React.createElement(LoginForm, null) : React.createElement(
+            this.xhr.gtlFetch('GET', '/auth', undefined, this.onXhrReady, [['Authorization', 'Basic RGF2aWQ6a2Vzbw==']]);
+        },
+        render: function () {
+            return React.createElement(
+                'form',
+                { onSubmit: this.onSubmit },
+                React.createElement('input', { type: 'text', name: 'u', onChange: this.uChange }),
+                React.createElement('input', { type: 'password', name: 'p', onChange: this.pChange }),
+                React.createElement('input', { type: 'submit', value: 'login' })
+            );
+        }
+    }),
+        Client = React.createClass({
+        displayName: 'Client',
+
+        getInitialState: function () {
+            return {};
+        },
+        render: function () {
+            return React.createElement(
                 'div',
                 null,
-                'logged in '
+                (() => {
+                    return bearer === undefined ? React.createElement(LoginForm, null) : React.createElement(
+                        'div',
+                        null,
+                        'logged in '
+                    );
+                })()
             );
-        };
-
-        return {
-            getInitialState: function () {
-                return {};
-            },
-            render: function () {
-                return React.createElement(
-                    'div',
-                    null,
-                    checkAuth()
-                );
-            }
-        };
-    }());
+        }
+    });
 
     ReactDOM.render(React.createElement(Client, null), gtlQ('body > main'));
 })();

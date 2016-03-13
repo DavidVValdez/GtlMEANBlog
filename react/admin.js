@@ -1,46 +1,54 @@
 (function(){
     'use strict';
     var
-    bearer,
     Gtl = require('/web/gtl/v04.20.00/gtl/js/core.js'),
     Xhr = require('/web/gtl/v04.20.00/gtl/js/xhr.js'),
     React = require('react'),
     ReactDOM = require('react-dom'),
 
-    LoginForm = React.createClass(function(){
-        var sendCredentials = function(evt){
+    bearer,
+
+    LoginForm = React.createClass({
+        xhr:gtlXhr(),
+        onXhrReady:function(){
+            console.log(arguments);
+        },
+        getInitialState:function(){
+            return {u:'', p:''};
+        },
+        uChange:function(evt){
+            this.setState({u:evt.target.value});
+        },
+        pChange:function(evt){
+            this.setState({p:evt.target.value});
+        },
+        onSubmit:function(evt){
             evt.preventDefault();
-            console.log(this);
-        };
-        return {
-            render:function(){
-                return (
-                        <form onSubmit={sendCredentials}>
-                        <input type="text" name="u" />
-                        <input type="password" name="p" />
-                        <input type="submit" value="login" />
-                        </form>
-                );
-            }
-        };
-    }()),
-    
-    Client = React.createClass(function(){
-        var checkAuth = function(){
-            return bearer === undefined ? <LoginForm /> : <div>logged in </div> ;
-        };
-        
-        return {
-            getInitialState:function(){
-                return {};
-            },
-            render:function(){
-                return (
-                    <div>{checkAuth()}</div>
-                );
-            }
+            this.xhr.gtlFetch('GET', '/auth', undefined, this.onXhrReady, [['Authorization','Basic RGF2aWQ6a2Vzbw==']]);
+        },
+        render:function(){
+            return (
+                    <form onSubmit={this.onSubmit}>
+                    <input type="text" name="u" onChange={this.uChange} />
+                    <input type="password" name="p" onChange={this.pChange} />
+                    <input type="submit" value="login" />
+                    </form>
+            );
         }
-    }());
+    }),
+    
+    Client = React.createClass({
+        getInitialState:function(){
+            return {};
+        },
+        render:function(){
+            return (
+                    <div>{(() => {
+                        return bearer === undefined ? <LoginForm /> : <div>logged in </div> ;
+                    })()}</div>
+            );
+        }
+    });
 
     ReactDOM.render(<Client />, gtlQ('body > main'));
 

@@ -1,0 +1,12 @@
+curl -iH 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiRGF2aWQgVmlsbGFsb2JvcyIsImlhdCI6MTQ1NjYyODkwM30.cNZXfLVhHR74W5ormyO7y1HKBJWXwYnDzFYUzo7ZSgI' 'http://localhost:8080/api/articles'
+
+curl -id '{"title":"Facus El Gato","content":"post acerca de Facus","publishDate":"2016-02-27T00:49:14.758Z"}' 'http://localhost:8080/api/articles'
+
+curl -d '{"u":"David","p":"kesimio"}' 'http://localhost:8080/auth'
+
+
+# wrong
+curl -iH 'Authorization: Basic RGF2aWQ6a2Vzbw==' 'http://localhost:8080/auth'
+
+# right
+curl -H 'Authorization: Basic RGF2aWQ6a2VzaW1pbw==' 'http://localhost:8080/auth'
