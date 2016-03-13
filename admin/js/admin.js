@@ -86,16 +86,6 @@
 },{}],2:[function(require,module,exports){
 (function () {
     var handler = function () {
-        /*
-        console.log(this.readyState);
-        console.log(this.getAllResponseHeaders());
-        */
-        if (this.getAllResponseHeaders().indexOf('WWW-Authenticate') > -1) {
-            this.abort();
-        }
-        if (this.status === 401) {
-            this.abort();
-        }
         if (this.readyState === 4) {
             if (this.gtl.cbk !== undefined) {
                 this.gtl.cbk(this.status, this.responseText.length > 0 ? JSON.parse(this.responseText) : undefined);
@@ -19161,34 +19151,36 @@ module.exports = require('./lib/React');
         Xhr = require('/web/gtl/v04.20.00/gtl/js/xhr.js'),
         React = require('react'),
         ReactDOM = require('react-dom'),
-        bearer,
-        LoginForm = React.createClass({
-        displayName: 'LoginForm',
+        List = React.createClass({
+        displayName: 'List',
 
-        xhr: gtlXhr(),
-        onXhrReady: function () {
-            console.log(arguments);
-        },
+        xhr: new XMLHttpRequest(),
         getInitialState: function () {
-            return { u: '', p: '' };
+            return {};
         },
-        uChange: function (evt) {
-            this.setState({ u: evt.target.value });
+        componentDidMount: function () {
+            console.log('keso');
         },
-        pChange: function (evt) {
-            this.setState({ p: evt.target.value });
+        onClickList: function (evt) {
+            console.log('list');
         },
-        onSubmit: function (evt) {
-            evt.preventDefault();
-            this.xhr.gtlFetch('GET', '/auth', undefined, this.onXhrReady, [['Authorization', 'Basic RGF2aWQ6a2Vzbw==']]);
+        onClickAdd: function (evt) {
+            console.log('add');
         },
         render: function () {
             return React.createElement(
-                'form',
-                { onSubmit: this.onSubmit },
-                React.createElement('input', { type: 'text', name: 'u', onChange: this.uChange }),
-                React.createElement('input', { type: 'password', name: 'p', onChange: this.pChange }),
-                React.createElement('input', { type: 'submit', value: 'login' })
+                'div',
+                null,
+                React.createElement(
+                    'button',
+                    { onClick: this.onClickList },
+                    'List'
+                ),
+                React.createElement(
+                    'button',
+                    { onClick: this.onClickAdd },
+                    'Add'
+                )
             );
         }
     }),
@@ -19196,111 +19188,34 @@ module.exports = require('./lib/React');
         displayName: 'Client',
 
         getInitialState: function () {
-            return {};
+            return { tab: 'list' };
         },
         render: function () {
             return React.createElement(
                 'div',
                 null,
                 (() => {
-                    return bearer === undefined ? React.createElement(LoginForm, null) : React.createElement(
+                    return this.state.tab === 'list' ? React.createElement(List, null) : React.createElement(
                         'div',
                         null,
-                        'logged in '
+                        'form'
                     );
                 })()
             );
         }
     });
 
-    ReactDOM.render(React.createElement(Client, null), gtlQ('body > main'));
+    (function () {
+        var xhr = new XMLHttpRequest();
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status !== 401) {
+                ReactDOM.render(React.createElement(Client, null), gtlQ('body > main'));
+            }
+        };
+        xhr.open('GET', '/auth');
+        xhr.send('');
+    })();
 })();
-/*
-(function(){
-    'use strict';
-    var React = require('react');
-    var ReactDOM = require('react-dom');
-
-    var data = [
-        {author:"keso", text:"gato bueno"},
-        {author:"facus", text:"gato malo"}
-    ];
-    
-    var Comment = React.createClass({
-        render:function(){
-            return (
-                <div>
-                    <h2>{this.props.author}</h2>
-                    {this.props.children}
-                </div>
-            );
-        }
-    });
-    
-    var CommentList = React.createClass({
-        render:function(){
-            var comments = this.props.data.map(function(comment, indx){
-                return (
-                    <Comment key={indx} author={comment.author}>{comment.text}</Comment>
-                );
-            });
-            return (
-                <div>
-                    {comments}
-                </div>
-            );
-        }
-    });
-    
-    var CommentForm = React.createClass({
-        getInitialState:function(){
-            return {author:'', text:''};
-        },
-        authorChange:function(e){
-            this.setState({author:e.target.value});
-        },
-        textChange:function(e){
-            this.setState({text:e.target.value});
-        },
-        onSubmit:function(e){
-            e.preventDefault();
-            data.push(this.state);
-            this.setState(this.getInitialState());
-            this.props.onSubmit();
-        },
-        render:function(){
-            return (
-                <div>
-                    <form onSubmit={this.onSubmit}>
-                        <input type="text" value={this.state.author} onChange={this.authorChange} />
-                        <input type="text" value={this.state.text} onChange={this.textChange} />
-                        <input type="submit" value="post" />
-                    </form>
-                </div>
-            );
-        }
-    });
-    
-    var CommentBox = React.createClass({
-        getInitialState:function(){
-            return {data:data};
-        },
-        onSubmit:function(){
-            this.setState(this.getInitialState());
-        },
-        render:function(){
-            return (
-                <div>
-                    <h1>Comments</h1>
-                    <CommentList data={this.props.data} />
-                    <CommentForm onSubmit={this.onSubmit} />
-                </div>
-            );
-        }
-    });
-
-    ReactDOM.render(<CommentBox data={data} />, document.querySelector('#keso'));
-}());
-*/
 
 },{"/web/gtl/v04.20.00/gtl/js/core.js":1,"/web/gtl/v04.20.00/gtl/js/xhr.js":2,"react":160,"react-dom":31}]},{},[161]);
