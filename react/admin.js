@@ -1,5 +1,53 @@
 (function(){
     'use strict';
+    var
+    bearer,
+    Gtl = require('/web/gtl/v04.20.00/gtl/js/core.js'),
+    Xhr = require('/web/gtl/v04.20.00/gtl/js/xhr.js'),
+    React = require('react'),
+    ReactDOM = require('react-dom'),
+
+    LoginForm = React.createClass(function(){
+        var sendCredentials = function(evt){
+            evt.preventDefault();
+            console.log(this);
+        };
+        return {
+            render:function(){
+                return (
+                        <form onSubmit={sendCredentials}>
+                        <input type="text" name="u" />
+                        <input type="password" name="p" />
+                        <input type="submit" value="login" />
+                        </form>
+                );
+            }
+        };
+    }()),
+    
+    Client = React.createClass(function(){
+        var checkAuth = function(){
+            return bearer === undefined ? <LoginForm /> : <div>logged in </div> ;
+        };
+        
+        return {
+            getInitialState:function(){
+                return {};
+            },
+            render:function(){
+                return (
+                    <div>{checkAuth()}</div>
+                );
+            }
+        }
+    }());
+
+    ReactDOM.render(<Client />, gtlQ('body > main'));
+
+}());
+/*
+(function(){
+    'use strict';
     var React = require('react');
     var ReactDOM = require('react-dom');
 
@@ -83,3 +131,4 @@
 
     ReactDOM.render(<CommentBox data={data} />, document.querySelector('#keso'));
 }());
+*/

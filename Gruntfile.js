@@ -3,7 +3,7 @@ module.exports = function(grunt){
         browserify:{
             dist:{
                 options:{
-                    transform:[['babelify',{presets:['../node_modules/babel-preset-react/']}]]
+                    transform:[['babelify',{presets:['/web/node/mean-blog/node_modules/babel-preset-react']}]]
                 },
                 src:'react/admin.js',
                 dest:'admin/js/admin.js'
