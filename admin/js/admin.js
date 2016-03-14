@@ -19186,6 +19186,69 @@ module.exports = require('./lib/React');
             );
         }
     }),
+        Form = React.createClass({
+        displayName: 'Form',
+
+        xhr: new XMLHttpRequest(),
+        getInitialState: function () {
+            return { title: '', content: '', publishDate: new Date().toISOString() };
+        },
+        titleChange: function (e) {
+            this.setState({ title: e.target.value });
+        },
+        contentChange: function (e) {
+            this.setState({ content: e.target.value });
+        },
+        onSubmit: function (e) {
+            e.preventDefault();
+            /*this.setState({publishDate:(new Date()).toISOString()});*/
+            this.xhr.onreadystatechange = () => {
+                if (this.xhr.readyState === 4) {
+                    this.props.switchUI('list');
+                }
+            };
+            this.xhr.open('POST', '/api/articles');
+            this.xhr.setRequestHeader('Authorization', 'Bearer ' + user.token);
+            this.xhr.send(JSON.stringify(this.state));
+            this.setState(this.getInitialState());
+            /*this.props.onSubmit();*/
+        },
+        render: function () {
+            return React.createElement(
+                'div',
+                null,
+                React.createElement(
+                    'form',
+                    { onSubmit: this.onSubmit },
+                    React.createElement(
+                        'h2',
+                        null,
+                        'Title:'
+                    ),
+                    React.createElement(
+                        'div',
+                        null,
+                        React.createElement('input', { type: 'text', value: this.state.title, onChange: this.titleChange })
+                    ),
+                    React.createElement(
+                        'h2',
+                        null,
+                        'Content:'
+                    ),
+                    React.createElement(
+                        'div',
+                        null,
+                        React.createElement('textarea', { value: this.state.content, onChange: this.contentChange })
+                    ),
+                    React.createElement(
+                        'div',
+                        null,
+                        React.createElement('input', { type: 'submit', value: 'post' })
+                    )
+                )
+            );
+        }
+    }),
         Client = React.createClass({
         displayName: 'Client',
 
@@ -19196,11 +19259,9 @@ module.exports = require('./lib/React');
             this.setState({ tab: ui });
         },
         onClickList: function (evt) {
-            console.log('list');
             this.switchUI('list');
         },
         onClickAdd: function (evt) {
-            console.log('add');
             this.switchUI('add');
         },
         render: function () {
@@ -19222,11 +19283,7 @@ module.exports = require('./lib/React');
                     )
                 ),
                 (() => {
-                    return this.state.tab === 'list' ? React.createElement(List, null) : React.createElement(
-                        'div',
-                        null,
-                        'form'
-                    );
+                    return this.state.tab === 'list' ? React.createElement(List, null) : React.createElement(Form, { switchUI: this.switchUI });
                 })()
             );
         }

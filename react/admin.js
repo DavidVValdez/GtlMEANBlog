@@ -37,6 +37,46 @@
         }
     }),
 
+    Form = React.createClass({
+        xhr:new XMLHttpRequest(),
+        getInitialState:function(){
+            return {title:'', content:'', publishDate:(new Date()).toISOString()};
+        },
+        titleChange:function(e){
+            this.setState({title:e.target.value});
+        },
+        contentChange:function(e){
+            this.setState({content:e.target.value});
+        },
+        onSubmit:function(e){
+            e.preventDefault();
+            /*this.setState({publishDate:(new Date()).toISOString()});*/
+            this.xhr.onreadystatechange = () => {
+                if(this.xhr.readyState === 4){
+                    this.props.switchUI('list');
+                }
+            };
+            this.xhr.open('POST','/api/articles');
+            this.xhr.setRequestHeader('Authorization','Bearer '+user.token);
+            this.xhr.send(JSON.stringify(this.state));
+            this.setState(this.getInitialState());
+            /*this.props.onSubmit();*/
+        },
+        render:function(){
+            return (
+                <div>
+                    <form onSubmit={this.onSubmit}>
+                        <h2>Title:</h2>
+                        <div><input type="text" value={this.state.title} onChange={this.titleChange} /></div>
+                        <h2>Content:</h2>
+                        <div><textarea value={this.state.content} onChange={this.contentChange}></textarea></div>
+                        <div><input type="submit" value="post" /></div>
+                    </form>
+                </div>
+            );
+        }
+    }),
+    
     Client = React.createClass({
         getInitialState:function(){
             return {tab:'list'};
@@ -45,11 +85,9 @@
             this.setState({tab:ui});
         },
         onClickList:function(evt){
-            console.log('list');
             this.switchUI('list');
         },
         onClickAdd:function(evt){
-            console.log('add');
             this.switchUI('add');
         },
         render:function(){
@@ -60,7 +98,7 @@
                         <button onClick={this.onClickAdd}>Add</button>
                     </div>
                     {(() => {
-                        return this.state.tab === 'list' ? <List /> : <div>form</div>
+                        return this.state.tab === 'list' ? <List /> : <Form switchUI={this.switchUI} />
                     })()}
                 </div>
             );
