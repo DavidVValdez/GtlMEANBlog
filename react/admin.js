@@ -1,6 +1,6 @@
 (function(){
     'use strict';
-    var
+    let
     Gtl = require('/web/gtl/v04.20.00/gtl/js/core.js'),
     Xhr = require('/web/gtl/v04.20.00/gtl/js/xhr.js'),
     $ = require('jquery'),
@@ -39,38 +39,33 @@
     }),
 
     Form = React.createClass({
-        xhr:new XMLHttpRequest(),
         getInitialState:function(){
             return {title:'', content:'', publishDate:(new Date()).toISOString()};
         },
-        titleChange:function(e){
-            this.setState({title:e.target.value});
-        },
-        contentChange:function(e){
-            this.setState({content:e.target.value});
-        },
-        onSubmit:function(e){
-            e.preventDefault();
-            /*this.setState({publishDate:(new Date()).toISOString()});*/
-            this.xhr.onreadystatechange = () => {
-                if(this.xhr.readyState === 4){
-                    this.props.switchUI('list');
-                }
-            };
-            this.xhr.open('POST','/api/articles');
-            this.xhr.setRequestHeader('Authorization','Bearer '+user.token);
-            this.xhr.send(JSON.stringify(this.state));
-            this.setState(this.getInitialState());
-            /*this.props.onSubmit();*/
+        onSubmit:function(evt){
+            let that = this;
+            evt.preventDefault();
+            $.ajax({
+                url:'/api/articles',
+                method:'POST',
+                headers:{'Authorization':'Bearer '+user.token},
+                data:JSON.stringify(this.state),
+                dataType:'json',
+                processData:false
+            })
+            .always(function(response){
+                that.setState(that.getInitialState());
+                that.props.switchUI();
+            });
         },
         render:function(){
             return (
                 <div>
                     <form onSubmit={this.onSubmit}>
                         <h2>Title:</h2>
-                        <div><input type="text" value={this.state.title} onChange={this.titleChange} /></div>
+                        <div><input placeholder="Enter a title" type="text" value={this.state.title} onChange={(evt) => {this.setState({title:evt.target.value})}} /></div>
                         <h2>Content:</h2>
-                        <div><textarea value={this.state.content} onChange={this.contentChange}></textarea></div>
+                        <div><textarea placeholder="your message" value={this.state.content} onChange={(evt) => {this.setState({content:evt.target.value})}}></textarea></div>
                         <div><input type="submit" value="post" /></div>
                     </form>
                 </div>
@@ -85,6 +80,10 @@
         switchUI:function(ui){
             this.setState({tab:ui});
         },
+        componentWillMount:function(){
+            this.form = <Form switchUI={() => this.switchUI('list')} />;
+            this.list = <List />;
+        },
         render:function(){
             return (
                 <div>
@@ -93,7 +92,7 @@
                         <button onClick={() => this.switchUI('add')}>Add</button>
                     </div>
                     {(() => {
-                        return this.state.tab === 'list' ? <List /> : <Form switchUI={this.switchUI} />
+                        return this.state.tab === 'list' ? this.list : this.form
                     })()}
                 </div>
             );
