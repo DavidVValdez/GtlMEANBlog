@@ -3,8 +3,8 @@
     var
     Gtl = require('/web/gtl/v04.20.00/gtl/js/core.js'),
     Xhr = require('/web/gtl/v04.20.00/gtl/js/xhr.js'),
-    React = require('react'),
     $ = require('jquery'),
+    React = require('react'),
     ReactDOM = require('react-dom'),
 
     user,
@@ -85,18 +85,12 @@
         switchUI:function(ui){
             this.setState({tab:ui});
         },
-        onClickList:function(evt){
-            this.switchUI('list');
-        },
-        onClickAdd:function(evt){
-            this.switchUI('add');
-        },
         render:function(){
             return (
                 <div>
                     <div>
-                        <button onClick={this.onClickList}>List</button>
-                        <button onClick={this.onClickAdd}>Add</button>
+                        <button onClick={() => this.switchUI('list')}>List</button>
+                        <button onClick={() => this.switchUI('add')}>Add</button>
                     </div>
                     {(() => {
                         return this.state.tab === 'list' ? <List /> : <Form switchUI={this.switchUI} />
@@ -106,19 +100,18 @@
         }
     });
 
-    console.log($(document));
+    window.$ = $;
+    window.jQuery = $;
+    
+    $(document).ready(function(){
+        $('head').append($('<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>'));
 
-    (function(){
-        var xhr = new XMLHttpRequest();
-        
-        xhr.onreadystatechange = function(){
-            if(xhr.readyState === 4 && xhr.status !== 401){
-                user = JSON.parse(xhr.responseText);
-                ReactDOM.render(<Client />, gtlQ('body > main'));
-            }
-        };
-        xhr.open('GET','/auth');
-        xhr.send('');
-    }());
+        $.ajax('/auth')
+        .done(function(response){
+            user = response;
+            ReactDOM.render(<Client />, gtlQ('body > main'));
+        });
+
+    });
 
 }());
