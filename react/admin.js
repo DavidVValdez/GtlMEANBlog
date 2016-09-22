@@ -4,6 +4,7 @@
     Gtl = require('/web/gtl/v04.20.00/gtl/js/core.js'),
     Xhr = require('/web/gtl/v04.20.00/gtl/js/xhr.js'),
     React = require('react'),
+    $ = require('jquery'),
     ReactDOM = require('react-dom'),
 
     user,
@@ -104,6 +105,8 @@
             );
         }
     });
+
+    console.log($(document));
 
     (function(){
         var xhr = new XMLHttpRequest();
